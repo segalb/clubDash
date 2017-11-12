@@ -1,7 +1,7 @@
 const passport = require('passport');
 const path = require('path');
 
-const { User, Waiver, Club } = require('../models/models');
+const { User, Waiver, Club, Event} = require('../models/models');
 
 const routeHelper = (app) => {
   app.post('/login',
@@ -34,8 +34,19 @@ const routeHelper = (app) => {
     res.redirect('/');
   });
 
+
   app.get('/userInfo', (req, res) => {
     res.json(req.user);
+  });
+
+  app.get('/userInfo/:userId', (req, res) => {
+    User.findById(req.params.userId, (err, profile) => res.json(profile));
+  });
+
+  app.get('/events', (req, res) => {
+    Event.find().lean().exec(function (err, users) {
+     res.json((users));
+});
   });
 
   app.post('/clubs', (req, res) => {
@@ -46,18 +57,47 @@ const routeHelper = (app) => {
       res.json({ success: false });
     }
   });
+
+
+
   app.get('/clubs', (req, res) => {
     Club.find((err, clubs) => res.json(clubs));
   });
   app.get('/clubs/:clubId', (req, res) => {
     Club.findById(req.params.clubId, (err, club) => res.json(club));
   });
+
+
   app.post('/clubs/:clubId', (req, res) => {
     Club.findOneAndUpdate(req.params.clubId,
       { $push: { members: req.user._id } },
       { safe: true, upsert: true },
       () => res.json({ success: true }),
     );
+  });
+
+// Saving an Event to DB
+  app.post('/saveEvent', (req, res) => {
+    console.log("save event got hit backend",req.body);
+
+    const newEvent = new Event({
+      allDay: false,
+      start: req.body.timeslotStart,
+      end: req.body.timeslotEnd,
+      origin: req.body.origin,
+      destination: req.body.destination,
+      organizer: req.body.profile._id,
+      riders: [],
+      freeSeats: req.body.numSeats,
+      desc: req.body.desc
+      });
+    newEvent.save((saveErr) => {
+      if (saveErr) {
+        console.log("err",saveErr)
+      } else {
+       res.json({ success: true });
+      }
+    });
   });
 
   app.post('/mainWaiver', (req, res) => {
@@ -73,6 +113,7 @@ const routeHelper = (app) => {
           user.waivers.push(newWaiver.id);
           user.save(() => res.json({ success: true }));
         });
+
       });
     }
   });

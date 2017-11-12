@@ -1,28 +1,47 @@
-import React from 'react';
-import axios from 'axios';
+import React from 'react'
+import axios from 'axios'
+import {DUMMY_EVENTS} from '../../Library/const'
 import {
   Image,
-} from 'react-bootstrap';
+  ListGroup,
+  ListGroupItem,
+  Button
+} from 'react-bootstrap'
 
 class Profile extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
-      profile: {},
-    };
+      profile: {}
+    }
   }
-  componentWillMount() {
+  componentWillMount () {
     axios.get('/userInfo')
-      .then(profile => this.setState({ profile: profile.data }));
+      .then(profile => this.setState({ profile: profile.data }))
   }
-  render() {
+
+  leaveTrip () {
+    console.log('trip left!')
+  }
+
+  deleteAccount () {
+    console.log('Account deleted!')
+  }
+
+  render () {
     return (
       <div className='contents'>
         <Image src={this.state.profile.imageUrl} circle />
         <p>{this.state.profile.name}</p>
+        <ListGroup>
+          {DUMMY_EVENTS.map((event, index) => {
+            return <ListGroupItem key={index}>{event.organizer}'s Trip: <Button onClick={this.leaveTrip.bind(this)}>Click to Leave Trip</Button></ListGroupItem>
+          })}
+        </ListGroup>
+        <Button onClick={this.deleteAccount}>Delete Account</Button>
       </div>
-    );
+    )
   }
 }
 
-export default Profile;
+export default Profile

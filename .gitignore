@@ -35,6 +35,8 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+build/app.bundle.js
+build/app.bundle.js.map
 
 # Typescript v1 declaration files
 typings/
@@ -57,4 +59,3 @@ typings/
 # dotenv environment variables file
 .env
 env.sh
-
